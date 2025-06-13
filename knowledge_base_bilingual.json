@@ -35,7 +35,7 @@
     "content_th": "**รูปแบบการตั้งชื่อ:** ให้ยึดตามมาตรฐานการตั้งชื่อของ C# โดยใช้ PascalCase สำหรับคลาส, เมธอด, property และ field (เช่น `LeaveRequest`, `SaveData()`, `EmployeeId`) และใช้ camelCase สำหรับตัวแปรภายในเมธอด (เช่น `leaveType`, `totalCount`)"
   },
   {
-    "ref_id": "BE-8",
+    "แนref_id": "BE-8",
     "content": "**Class and File Naming Consistency:** Ensure that the class name matches its corresponding file name and that the namespace accurately reflects the folder structure. For example, a class named `Detail` should be in a file named `Detail.cs` within a namespace like `Application.Features.ORTS02`.",
     "content_th": "**ความสอดคล้องของชื่อคลาสและไฟล์:** ตรวจสอบให้แน่ใจว่าชื่อคลาสตรงกับชื่อไฟล์ และ namespace สอดคล้องกับโครงสร้างของโฟลเดอร์ ตัวอย่างเช่น คลาสชื่อ `Detail` ควรอยู่ในไฟล์ชื่อ `Detail.cs` และอยู่ภายใน namespace เช่น `Application.Features.ORTS02`"
   },
@@ -53,11 +53,6 @@
     "ref_id": "BE-11",
     "content": "**SQL Statement Formatting:** Format complex SQL queries in a `StringBuilder` using multi-line string literals (e.g., `sql.Append(@\"SELECT ... FROM ...\")`) instead of multiple `AppendLine()` calls. This approach makes the raw SQL statement easier to copy and debug directly in a database client.",
     "content_th": "**การจัดรูปแบบคำสั่ง SQL:** จัดรูปแบบคำสั่ง SQL ที่ซับซ้อนใน `StringBuilder` โดยใช้สตริงหลายบรรทัด (เช่น `sql.Append(@\"SELECT ... FROM ...\")`) แทนการเรียก `AppendLine()` หลายๆ ครั้ง วิธีนี้ทำให้สามารถคัดลอกคำสั่ง SQL ไปทดสอบในโปรแกรมจัดการฐานข้อมูลได้ง่ายขึ้น"
-  },
-  {
-    "ref_id": "BE-12",
-    "content": "**Differentiate QueryAsync and ExecuteAsync:** Use `_context.QueryAsync<T>()` for read operations (SELECT) that return data, resulting in an `IEnumerable<T>`. Use `_context.ExecuteAsync()` for write operations (INSERT, UPDATE, DELETE) that modify data, which returns an integer representing the number of affected rows.",
-    "content_th": "**ความแตกต่างระหว่าง QueryAsync และ ExecuteAsync:** ใช้ `_context.QueryAsync<T>()` สำหรับการดำเนินการอ่านข้อมูล (SELECT) ที่ต้องการผลลัพธ์เป็นข้อมูล ซึ่งจะคืนค่าเป็น `IEnumerable<T>` ในขณะที่ใช้ `_context.ExecuteAsync()` สำหรับการดำเนินการเขียนข้อมูล (INSERT, UPDATE, DELETE) ซึ่งจะคืนค่าเป็นจำนวนเต็มที่ระบุจำนวนแถวที่ได้รับผลกระทบ"
   },
   {
     "ref_id": "BE-13",

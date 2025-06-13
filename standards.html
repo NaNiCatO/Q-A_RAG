@@ -408,3 +408,9 @@ using (MemoryStream ms = new())
     </div>
 </body>
 </html>
+
+  <!-- {
+    "ref_id": "BE-12",
+    "content": "**Differentiate QueryAsync and ExecuteAsync:** Use `_context.QueryAsync<T>()` for read operations (SELECT) that return data, resulting in an `IEnumerable<T>`. Use `_context.ExecuteAsync()` for write operations (INSERT, UPDATE, DELETE) that modify data, which returns an integer representing the number of affected rows.",
+    "content_th": "**ความแตกต่างระหว่าง QueryAsync และ ExecuteAsync:** ใช้ `_context.QueryAsync<T>()` สำหรับการดำเนินการอ่านข้อมูล (SELECT) ที่ต้องการผลลัพธ์เป็นข้อมูล ซึ่งจะคืนค่าเป็น `IEnumerable<T>` ในขณะที่ใช้ `_context.ExecuteAsync()` สำหรับการดำเนินการเขียนข้อมูล (INSERT, UPDATE, DELETE) ซึ่งจะคืนค่าเป็นจำนวนเต็มที่ระบุจำนวนแถวที่ได้รับผลกระทบ"
+  }, -->
