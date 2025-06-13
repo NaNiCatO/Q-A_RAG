@@ -36,14 +36,18 @@
             padding-bottom: 15px;
             border-bottom: 3px solid;
         }
+        h2, h3 {
+            scroll-margin-top: 20px; /* Offset for anchor links */
+        }
         h2 {
             margin-top: 45px;
             border-bottom: 1px solid #e9ecef;
             padding-bottom: 10px;
-            scroll-margin-top: 20px; /* Offset for anchor links */
         }
         h3 {
             margin-top: 25px;
+            padding-bottom: 5px;
+            border-bottom: 1px dotted #ced4da;
         }
         hr {
             border: none;
@@ -103,16 +107,15 @@
 </head>
 <body>
     <div class="container">
-        <!-- ====================================================== -->
-        <!--                BACKEND CODING STANDARDS                -->
-        <!-- ====================================================== -->
         <section class="backend">
             <h1>Standard Coding (Backend)</h1>
 
             <div class="rule-section">
                 <h2 id="be-rule-1">1. การบันทึก Log และระดับของ Log ที่ถูกต้อง</h2>
+                <p>การบันทึก Log เป็นสิ่งสำคัญสำหรับการติดตามการทำงานและแก้ไขข้อบกพร่องของโปรแกรม.</p>
+
                 <h3 id="be-rule-1.1">1.1 Info: บันทึกพารามิเตอร์</h3>
-                <p>ควรบันทึกพารามิเตอร์ที่รับเข้ามาในฟังก์ชันก่อนที่จะทำการ <code>_context.QueryAsync</code> หรือ <code>_context.ExecuteAsync</code></p>
+                <p>ควรบันทึกพารามิเตอร์ที่รับเข้ามาในฟังก์ชันก่อนที่จะทำการ <code>_context.QueryAsync</code> หรือ <code>_context.ExecuteAsync</code>.</p>
                 <pre><code>var parameters = new
 {
     company = _user.Company,
@@ -122,43 +125,49 @@
 
 _logger.LogInformation("SQL Parameters: {@parameters}", parameters);</code></pre>
                 
+                <div class="note">
+                    <h4>ความแตกต่างระหว่าง QueryAsync และ ExecuteAsync</h4>
+                    <ul>
+                        <li><code>_context.QueryAsync&lt;T&gt;()</code>
+                            <ul>
+                                <li><strong>ใช้เมื่อ:</strong> ต้องการอ่านข้อมูล (SELECT) จากฐานข้อมูล.</li>
+                                <li><strong>ผลลัพธ์:</strong> คืนค่ากลับมาเป็น <code>IEnumerable&lt;T&gt;</code> หรือ <code>List&lt;T&gt;</code> (เช่น รายการของ record).</li>
+                                <li><strong>กรณีใช้:</strong> เมื่อต้องการข้อมูลกลับมา.</li>
+                            </ul>
+                        </li>
+                        <li><code>_context.ExecuteAsync()</code>
+                            <ul>
+                                <li><strong>ใช้เมื่อ:</strong> ต้องการเปลี่ยนแปลงข้อมูล (INSERT, UPDATE, DELETE).</li>
+                                <li><strong>ผลลัพธ์:</strong> คืนค่าเป็น <code>int</code> ซึ่งคือจำนวนแถวที่ถูกเปลี่ยนแปลง.</li>
+                                <li><strong>กรณีใช้:</strong> เมื่อไม่ต้องการข้อมูลกลับมา แต่สนใจแค่ว่าสำเร็จหรือไม่.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+
                 <h3 id="be-rule-1.2">1.2 Info: บันทึกรายละเอียดของกระบวนการ</h3>
                 <p>ใน 1 ฟังก์ชันควรมี Logger อย่างน้อย 3 จุด:</p>
                 <ul>
-                    <li><b>Logger Start:</b> อยู่ตอนต้นของ <code>try{...}</code> โดยใช้รูปแบบ: <code>[ชื่อฟังก์ชัน] Start &lt;การทำงาน&gt; &lt;ชื่อ Module&gt;</code></li>
-                    <li><b>Logger End/Success:</b> อยู่ก่อน <code>return</code> เพื่อยืนยันว่าการทำงานสำเร็จ โดยใช้รูปแบบ: <code>[ชื่อฟังก์ชัน] &lt;End/Success&gt; &lt;การทำงาน&gt; &lt;ชื่อ Module&gt;</code></li>
-                    <li><b>Logger Error:</b> อยู่ใน <code>catch{...}</code> เพื่อบันทึกข้อผิดพลาด โดยใช้รูปแบบ: <code>[ชื่อฟังก์ชัน] Error &lt;การทำงาน&gt; &lt;ชื่อ Module&gt;</code></li>
+                    <li><b>Logger Start:</b> อยู่ตอนต้นของ <code>try{...}</code> โดยใช้รูปแบบ: <code>[ชื่อฟังก์ชัน] Start &lt;การทำงาน&gt; &lt;ชื่อ Module&gt;</code>.</li>
+                    <li><b>Logger End/Success:</b> อยู่ก่อน <code>return</code> เพื่อยืนยันว่าการทำงานสำเร็จ โดยใช้รูปแบบ: <code>[ชื่อฟังก์ชัน] &lt;End/Success&gt; &lt;การทำงาน&gt; &lt;ชื่อ Module&gt;</code> (ถ้าอยู่ติดกับ Logger Start ก็ไม่ต้องมี).</li>
+                    <li><b>Logger Error:</b> อยู่ใน <code>catch{...}</code> เพื่อบันทึกข้อผิดพลาด โดยใช้รูปแบบ: <code>[ชื่อฟังก์ชัน] Error &lt;การทำงาน&gt; &lt;ชื่อ Module&gt;</code>.</li>
                 </ul>
-                <pre><code>private async Task&lt;IEnumerable&lt;Ddl&gt;&gt; GetEmpType(CancellationToken cancellationToken)
-{
-    try
-    {
-        _logger.LogInformation("[GetEmpType] Start Get Employee Type RDMS02");
-        // ... code ...
-        _logger.LogInformation("[GetEmpType] Successfully retrieved Employee Type RDMS02");
-        return result;
-    }
-    catch (Exception ex)
-    {
-        _logger.LogError(ex, "[GetEmpType] Error occurred while processing your request Get Employee Type RDMS02");
-        throw new Exception(ex.Message);
-    }
-}</code></pre>
+                
                 <div class="note">
-                    <p>หากเป็นฟังก์ชันที่ handle/handler ให้ใช้ชื่อคลาสแทนชื่อฟังก์ชัน เช่น: <code>[ชื่อคลาส] Start &lt;การทำงาน&gt; &lt;ชื่อ Module&gt;</code></p>
+                    <p>หากเป็นฟังก์ชันที่ handle/handler ให้ใช้ชื่อคลาสแทนชื่อฟังก์ชัน เช่น: <code>[ชื่อคลาส] Start &lt;การทำงาน&gt; &lt;ชื่อ Module&gt;</code>.</p>
                 </div>
 
                 <h3 id="be-rule-1.3">1.3 Error: บันทึกข้อยกเว้น (Exception)</h3>
-                <p>ใช้ <code>LogError</code> สำหรับบันทึก Exception เท่านั้น เพื่อไม่ให้เกิดความสับสนกับ Log ประเภทอื่น</p>
+                <p>ใช้ <code>LogError</code> สำหรับบันทึก Exception เท่านั้น เพื่อไม่ให้เกิดความสับสนกับ Log ประเภทอื่นที่ใช้ดูค่า.</p>
             </div>
 
             <hr>
 
             <div class="rule-section">
                 <h2 id="be-rule-2">2. ใช้ AddRangeAsync สำหรับการเพิ่มข้อมูลจำนวนมาก</h2>
-                <p>เมื่อต้องการเพิ่มข้อมูลหลายรายการพร้อมกัน และข้อมูลนั้นตรงกับโครงสร้างของ Entity ให้ใช้ <code>AddRangeAsync</code> เพื่อประสิทธิภาพที่ดีกว่า โดยวนลูปสร้าง List ของ Entity แล้วจึงเรียกใช้ <code>_context.Set&lt;T&gt;().AddRangeAsync(...)</code></p>
+                <p>เมื่อต้องการเพิ่มข้อมูลหลายรายการพร้อมกัน และข้อมูลนั้นตรงกับโครงสร้างของ Entity ให้ใช้ <code>AddRangeAsync</code> เพื่อประสิทธิภาพที่ดีกว่า โดยวนลูปสร้าง <code>List&lt;&gt;</code> ของ Entity แล้วจึงเรียกใช้ <code>_context.Set&lt;T&gt;().AddRangeAsync(...)</code>.</p>
                 <div class="warning">
-                    <p><b>ข้อควรระวัง:</b> ใช้ได้เฉพาะกับการเพิ่มข้อมูล (Insert) เท่านั้น ไม่สามารถใช้กับการอัปเดตข้อมูล (Update) ได้</p>
+                    <p><b>ข้อควรระวัง:</b> ใช้ได้เฉพาะกรณีเพิ่มข้อมูล (Insert) เท่านั้น ไม่สามารถใช้ update ข้อมูลได้.</p>
                 </div>
             </div>
 
@@ -166,29 +175,29 @@ _logger.LogInformation("SQL Parameters: {@parameters}", parameters);</code></pre
 
             <div class="rule-section">
                 <h2 id="be-rule-3">3. ทุก Method ต้องมี Try-Catch และ Throw new Exception</h2>
-                <p>ทุกๆ Method ควรถูกครอบด้วย <code>try-catch</code> block และใน block <code>catch</code> จะต้องมีการ <code>throw new Exception(ex.Message);</code> ต่อเสมอ เพื่อส่งต่อ Exception ไปยังส่วนกลางสำหรับจัดการ Error</p>
+                <p>ทุกๆ Method ควรถูกครอบด้วย <code>try-catch</code> block และใน block <code>catch</code> จะต้องมีการ <code>throw new Exception(ex.Message);</code> ที่บรรทัดสุดท้ายเสมอ.</p>
             </div>
 
             <hr>
 
             <div class="rule-section">
                 <h2 id="be-rule-4">4. การคำนวณทั้งหมดควรทำที่ Backend</h2>
-                <p>เพื่อความปลอดภัยและถูกต้องของข้อมูล ควรหลีกเลี่ยงการคำนวณค่าต่างๆ ที่ฝั่ง Frontend ให้ส่งแค่ข้อมูลดิบหรือ ID ที่จำเป็นมาให้ Backend คำนวณเอง</p>
+                <p>เพื่อความปลอดภัยและถูกต้องของข้อมูล ควรหลีกเลี่ยงการคำนวณที่ Frontend. ให้ Frontend ส่งแค่ ID ของรายการมาให้ Backend จากนั้น Backend จะไปดึงข้อมูลจริงจากฐานข้อมูลมาคำนวณและบันทึกผลเอง.</p>
             </div>
             
             <hr>
 
             <div class="rule-section">
                 <h2 id="be-rule-5">5. ตรวจสอบฟิลด์ที่จำเป็น (Required Field) ที่ Backend</h2>
-                <p>แม้ว่า Frontend จะมีการตรวจสอบแล้ว แต่ Backend ก็ควรมีการตรวจสอบฟิลด์ที่จำเป็นอีกครั้ง เพื่อป้องกันการยิง Request ตรงๆ ผ่านเครื่องมืออื่น</p>
+                <p>แม้ว่า Frontend จะมีการตรวจสอบแล้ว แต่ Backend ก็ควรมีการตรวจสอบฟิลด์ที่จำเป็นอีกครั้งก่อนบันทึกข้อมูล เพื่อป้องกันการยิง Request ตรงๆ ผ่านเครื่องมืออื่น เช่น Postman.</p>
             </div>
 
             <hr>
             
             <div class="rule-section">
                 <h2 id="be-rule-6">6. ตรวจสอบความยาวของฟิลด์ให้ตรงกับฐานข้อมูล</h2>
-                <p>สามารถใช้ Data Annotations เช่น <code>[Required]</code> และ <code>[MaxLength(255)]</code> ใน Domain Entities เพื่อกำหนดคุณสมบัติของฟิลด์ให้สอดคล้องกับฐานข้อมูลได้</p>
-                 <div class="note"><p>การใช้ <code>[Required]</code> ไม่สามารถป้องกันค่าที่เป็นช่องว่าง (whitespace) ได้ หากต้องการดักจับช่องว่างต้องเขียนโค้ดตรวจสอบเพิ่มเติม</p></div>
+                <p>สามารถใช้ Data Annotations เช่น <code>[Required]</code> และ <code>[MaxLength(255)]</code> ใน Domain Entities (ไฟล์ในโฟลเดอร์ <code>Domain\Entities</code>) เพื่อกำหนดคุณสมบัติของฟิลด์ได้.</p>
+                 <div class="note"><p>การใช้ <code>[Required]</code> ไม่สามารถป้องกันค่าที่เป็นช่องว่าง (whitespace) ได้ แต่ดักจับได้เพียงค่า null หากต้องการดักจับช่องว่างต้องเขียนโค้ดตรวจสอบเพิ่มเติม.</p></div>
             </div>
             
             <hr>
@@ -200,10 +209,10 @@ _logger.LogInformation("SQL Parameters: {@parameters}", parameters);</code></pre
                         <tr><th>ประเภท</th><th>รูปแบบ</th><th>ตัวอย่าง</th></tr>
                     </thead>
                     <tbody>
-                        <tr><td>คลาส (Class)</td><td>PascalCase</td><td><code>LeaveRequest</code>, <code>IUserService</code></td></tr>
-                        <tr><td>ตัวแปรภายใน Method</td><td>camelCase</td><td><code>leaveType</code>, <code>totalCount</code></td></tr>
-                        <tr><td>Property / Field</td><td>PascalCase</td><td><code>EmployeeId</code>, <code>StartDate</code></td></tr>
-                        <tr><td>ฟังก์ชัน (Method)</td><td>PascalCase</td><td><code>SaveData()</code>, <code>ValidateForm()</code></td></tr>
+                        <tr><td>คลาส (Class)</td><td>PascalCase</td><td><code>LeaveRequest</code>, <code>IUserService</code> </td></tr>
+                        <tr><td>ตัวแปรภายใน Method</td><td>camelCase</td><td><code>leaveType</code>, <code>totalCount</code> </td></tr>
+                        <tr><td>Property / Field</td><td>PascalCase</td><td><code>EmployeeId</code>, <code>StartDate</code> </td></tr>
+                        <tr><td>ฟังก์ชัน (Method)</td><td>PascalCase</td><td><code>SaveData()</code>, <code>ValidateForm()</code> </td></tr>
                     </tbody>
                 </table>
             </div>
@@ -212,202 +221,191 @@ _logger.LogInformation("SQL Parameters: {@parameters}", parameters);</code></pre
             
             <div class="rule-section">
                 <h2 id="be-rule-8">8. ตรวจสอบชื่อคลาสและ Namespace ให้ถูกต้อง</h2>
-                <p>ชื่อไฟล์ C# ควรตรงกับชื่อคลาสที่อยู่ภายในไฟล์ และชื่อโฟลเดอร์ควรตรงกับชื่อ Namespace</p>
+                <p>ชื่อโฟลเดอร์ควรตรงกับชื่อ Namespace และชื่อไฟล์ <code>.cs</code> ควรตรงกับชื่อคลาสที่อยู่ภายในไฟล์.</p>
             </div>
             
             <hr>
 
             <div class="rule-section">
                 <h2 id="be-rule-9">9. ใช้ค่าคงที่ (Constants)</h2>
-                <p>สำหรับค่าที่ไม่เปลี่ยนแปลง (เช่น "Y", "N") ควรประกาศเป็นค่าคงที่ (Constant) ในคลาสที่จัดเก็บค่าคงที่โดยเฉพาะ เพื่อให้โค้ดอ่านเข้าใจง่ายและบำรุงรักษาสะดวก</p>
+                <p>สำหรับค่าที่ไม่เปลี่ยนแปลง ควรประกาศเป็นค่าคงที่ (Constant) ในคลาสที่จัดเก็บค่าคงที่โดยเฉพาะ (เช่น ในโฟลเดอร์ <code>Application\Common\Constants</code>) เพื่อให้โค้ดอ่านเข้าใจง่ายและบำรุงรักษาสะดวก.</p>
             </div>
 
             <hr>
             
             <div class="rule-section">
                 <h2 id="be-rule-10">10. การจัดการไฟล์: ต้องปิด MemoryStream ทุกครั้ง</h2>
-                <p>เมื่อทำงานกับไฟล์ผ่าน <code>MemoryStream</code>, ควรใช้ <code>using</code> statement เพื่อให้แน่ใจว่า Stream จะถูกปิดและคืนหน่วยความจำโดยอัตโนมัติ</p>
-                <pre><code>XLWorkbook NewWorkbook;
-using (MemoryStream ms = new())
-{
-    request.File.CopyTo(ms);
-    ms.Seek(0, SeekOrigin.Begin); // ย้อนกลับไปอ่านตั้งแต่ต้น
-    NewWorkbook = new XLWorkbook(ms);
-} // ms is automatically disposed here</code></pre>
+                <p>เมื่อทำงานกับไฟล์ผ่าน <code>MemoryStream</code>, ควรใช้ <code>using</code> statement เพื่อให้แน่ใจว่า Stream จะถูกปิดและคืนหน่วยความจำโดยอัตโนมัติหลังจากทำงานเสร็จสิ้นใน block ของมัน.</p>
             </div>
             
             <hr>
             
             <div class="rule-section">
                 <h2 id="be-rule-11">11. รูปแบบการเขียน SQL Statement</h2>
-                <p>ควรใช้ <code>@""</code> (Verbatim String Literal) ในการเขียนคำสั่ง SQL ที่มีความยาวหลายบรรทัด เพื่อให้คัดลอกไปทดสอบได้สะดวก</p>
+                <p>ควรใช้ <code>@""</code> (Verbatim String Literal) ในการเขียนคำสั่ง SQL ที่มีความยาวหลายบรรทัด เพื่อให้คัดลอกไปทดสอบในโปรแกรมจัดการฐานข้อมูลได้สะดวกกว่าการใช้ <code>sql.AppendLine()</code>.</p>
             </div>
             
             <hr>
             
             <div class="rule-section">
                 <h2 id="be-rule-13">13. การ Log คำสั่ง SQL</h2>
-                <p>ก่อนที่จะรันคำสั่ง SQL ควรมีการ log ตัวคำสั่ง SQL ที่จะถูกรันออกไปก่อนเสมอ เพื่อช่วยให้การดีบักทำได้ง่ายขึ้น</p>
-                <pre><code>_logger.LogInformation("[List] RDMS02 sql: {sql}", sql.ToString());</code></pre>
+                <p>นอกจากการ Log ตอนเริ่ม, จบ, และเกิดข้อผิดพลาดแล้ว ควรมีการ log ตัวคำสั่ง SQL ที่จะถูกรันออกไปก่อนเสมอ เพื่อช่วยให้การดีบักทำได้ง่ายขึ้น.</p>
+                <pre><code>_logger.LogInformation("[methodName] SQL => {SqlQuery}", sql.ToString());</code></pre>
             </div>
 
             <hr>
 
             <div class="rule-section">
                 <h2 id="be-rule-14">14. ตรวจสอบประเภทของไฟล์</h2>
-                <p>ควรมีการตรวจสอบประเภทของไฟล์ที่อัปโหลดเข้ามาว่าเป็นไปตามที่ระบบต้องการหรือไม่ เช่น .pdf, .xlsx, .jpg</p>
+                <p>ควรมีการตรวจสอบประเภทของไฟล์ที่อัปโหลดเข้ามาว่าเป็นไปตามที่ระบบต้องการหรือไม่ (เช่น pdf, excel, jpg, png).</p>
             </div>
             
             <hr>
 
             <div class="rule-section">
                 <h2 id="be-rule-15">15. ตรวจสอบ Array หรือ Collection ก่อนใช้งาน</h2>
-                <p>ก่อนที่จะวนลูป (foreach) หรือเข้าถึงข้อมูลใน Array/Collection, ควรตรวจสอบก่อนว่า object นั้นไม่ใช่ <code>null</code> และมีสมาชิกอยู่ (<code>items.Any()</code>) เพื่อป้องกัน <code>NullReferenceException</code></p>
+                <p>ก่อนที่จะวนลูป (foreach) หรือเข้าถึงข้อมูลใน Array/Collection, ควรตรวจสอบก่อนว่า object นั้นไม่ใช่ <code>null</code> และมีสมาชิกอยู่ (<code>items.Any()</code>) เพื่อป้องกัน <code>NullReferenceException</code>.</p>
             </div>
             
             <hr>
             
             <div class="rule-section">
                 <h2 id="be-rule-16">16. ตรวจสอบ Null ใน Object ที่มีความเสี่ยง</h2>
-                <p>ก่อนจะเข้าถึง Property ของ Object ที่ได้มาจากการ Query ซึ่งอาจมีค่าเป็น <code>null</code>, ควรมีการตรวจสอบก่อนเสมอ โดยสามารถใช้ Null-conditional operator (<code>?.</code>) ได้</p>
+                <p>ก่อนจะเข้าถึง Property ของ Object ที่ได้มาจากการ Query ซึ่งอาจมีค่าเป็น <code>null</code>, ควรมีการตรวจสอบก่อนเสมอ โดยสามารถใช้ Null-conditional operator (<code>?.</code>) ได้.</p>
             </div>
 
             <hr>
             
             <div class="rule-section">
-                <h2 id="be-rule-17">17. Master.cs ไม่ควรมีมากกว่า 1 ไฟล์ต่อ 1 Module</h2>
-                <p>ในแต่ละ Module ควรมีไฟล์ <code>Master.cs</code> เพียงไฟล์เดียวสำหรับจัดการข้อมูล Master ทั้งหมด โดยใช้ <code>switch-case</code> เพื่อแยกการทำงานตามประเภทของข้อมูลที่ร้องขอ</p>
+                <h2 id="be-rule-17">17. Master.cs ไม่ควรมีมากกว่า 1 ไฟล์ ต่อ 1 Module</h2>
+                <p>ในแต่ละ Module ควรมีไฟล์ <code>Master.cs</code> เพียงไฟล์เดียวสำหรับจัดการข้อมูล Master ทั้งหมด โดยใช้ <code>switch-case</code> เพื่อแยกการทำงานตามประเภทของข้อมูลที่ร้องขอ สามารถดู <code>RDRP04</code> เป็นตัวอย่างได้.</p>
             </div>
         </section>
 
         <br><br><br>
 
-        <!-- ====================================================== -->
-        <!--               FRONTEND CODING STANDARDS                -->
-        <!-- ====================================================== -->
         <section class="frontend">
             <h1>Standard Coding (Frontend)</h1>
             
             <div class="rule-section">
                 <h2 id="fe-rule-1">1. ชื่อ Page และ Component</h2>
-                <p>ตั้งชื่อ Component ให้ถูกต้องและสื่อความหมาย สำหรับหน้าเพิ่มและแก้ไข/รายละเอียด ให้สร้างเป็น Component เดียวกัน โดยใช้ <code>*ngIf='isEdit'</code> เพื่อควบคุมการแสดงผล</p>
+                <p>ตั้งชื่อ Component ให้ถูกต้อง สื่อความหมาย และกระชับ สำหรับหน้าที่มีทั้งการ "เพิ่ม" และ "แก้ไข/รายละเอียด" ให้สร้างเป็น Component เดียวกัน (เช่น <code>orms04-detail</code>) และใช้ตัวแปร (เช่น <code>isEdit</code>) กับ <code>*ngIf</code> เพื่อควบคุมการแสดงผลระหว่างสองโหมดนี้.</p>
             </div>
             
             <hr>
 
             <div class="rule-section">
-                <h2 id="fe-rule-2">2. extends SubscriptionDisposer, implements OnInit และ OnDestroy</h2>
-                <p>ทุกๆ Component ต้อง <code>extends SubscriptionDisposer</code> และเรียก <code>super()</code> ใน constructor หากมีการใช้งาน <code>ngOnInit()</code> ต้อง <code>implements OnInit</code> ด้วย และหาก override <code>ngOnDestroy()</code> จะต้องเรียก <code>super.ngOnDestroy()</code> เป็นบรรทัดสุดท้ายเสมอ</p>
+                <h2 id="fe-rule-2">2. Lifecycle Hooks: OnInit และ OnDestroy</h2>
+                <p>ทุก Component ต้อง <code>extends SubscriptionDisposer</code> และเรียก <code>super()</code> ใน constructor. หากใช้ <code>ngOnInit()</code> ต้อง <code>implements OnInit</code> ด้วย. หากมีการทำงานตอนออกจาก Component, ให้ override method <code>ngOnDestroy()</code> และต้องเรียก <code>super.ngOnDestroy()</code> เป็นบรรทัดสุดท้ายเสมอ.</p>
             </div>
 
             <hr>
             
             <div class="rule-section">
                 <h2 id="fe-rule-3">3. ใช้ Constants สำหรับชื่อเฉพาะและ Path</h2>
-                <p>สำหรับค่าคงที่ เช่น URL path ของ API หรือชื่อคอลัมน์ ควรประกาศไว้ใน <code>enum</code> เพื่อให้ง่ายต่อการจัดการและป้องกันการพิมพ์ผิด</p>
+                <p>สำหรับค่าคงที่ เช่น URL path ของ API หรือชื่อคอลัมน์ ควรประกาศไว้ใน <code>enum</code> เพื่อให้ง่ายต่อการจัดการและป้องกันการพิมพ์ผิด.</p>
             </div>
             
             <hr>
 
             <div class="rule-section">
                 <h2 id="fe-rule-4">4. ใช้ subscribe ใน format (next, error)</h2>
-                <p>เมื่อทำการ subscribe Observable, ให้ใช้ format ที่มี object <code>next</code> และ <code>error</code> เพื่อจัดการกับผลลัพธ์ที่สำเร็จและข้อผิดพลาดอย่างชัดเจน</p>
+                <p>เมื่อทำการ subscribe Observable, ให้ใช้ format ที่มี object <code>next</code> และ <code>error</code> เพื่อจัดการกับผลลัพธ์ที่สำเร็จและข้อผิดพลาดอย่างชัดเจน.</p>
             </div>
 
             <hr>
             
             <div class="rule-section">
-                <h2 id="fe-rule-5">5. path ใน service ต้องสร้างเป็น constants</h2>
-                <p>เช่นเดียวกับข้อ 3, Path ของ API ที่ใช้ใน Service ควรถูกกำหนดเป็นค่าคงที่ใน <code>enum</code></p>
+                <h2 id="fe-rule-5">5. Path ใน Service ต้องสร้างเป็น Constants</h2>
+                <p>เช่นเดียวกับข้อ 3, Path ของ API ที่ใช้ใน Service ควรถูกกำหนดเป็นค่าคงที่ใน <code>enum</code> เพื่อความถูกต้องและง่ายต่อการบำรุงรักษา.</p>
             </div>
             
             <hr>
 
             <div class="rule-section">
-                <h2 id="fe-rule-6">6. ไม่ new Date() ด้วยตัวเอง</h2>
-                <p>ให้ยิง API ไปขอเวลาจาก Backend ผ่าน <code>DatetimeService</code> เพื่อให้แน่ใจว่าเวลาที่ใช้เป็นเวลามาตรฐานของ Server ไม่ใช่เวลาจากเครื่อง Client</p>
+                <h2 id="fe-rule-6">6. การจัดการวันที่: ไม่ new Date() โดยตรง</h2>
+                <p>ให้เรียกใช้ <code>DatetimeService</code> เพื่อยิง API ไปขอเวลาจาก Server มาใช้งานแทน เพื่อให้แน่ใจว่าเวลาที่ใช้เป็นเวลามาตรฐานเดียวกันทั่วทั้งระบบ.</p>
             </div>
 
             <hr>
 
             <div class="rule-section">
-                <h2 id="fe-rule-7">7. ใช้ DatePipe สำหรับการแปลง Date</h2>
-                <p>สำหรับการจัดรูปแบบวันที่ ให้ใช้ <code>DatePipe</code> ของ Angular โดยต้องเพิ่มเข้าไปใน <code>providers</code> ของ Component และ inject ใน <code>constructor</code> ก่อนใช้งาน</p>
+                <h2 id="fe-rule-7">7. ใช้ DatePipe สำหรับการแปลงรูปแบบ Date</h2>
+                <p>สำหรับการจัดรูปแบบวันที่เพื่อแสดงผล ให้ใช้ <code>DatePipe</code> ของ Angular โดยต้องเพิ่มเข้าไปใน <code>providers</code> ของ Component และ inject ใน <code>constructor</code> ก่อนใช้งาน.</p>
             </div>
             
             <hr>
 
             <div class="rule-section">
-                <h2 id="fe-rule-8">8. ไม่คำนวณที่หน้าบ้าน</h2>
-                <p>หลีกเลี่ยงการคำนวณหรือการตรวจสอบข้อมูลที่ซับซ้อนที่ฝั่ง Frontend ให้ส่งข้อมูลที่จำเป็นไปให้ Backend เป็นผู้ประมวลผลและตรวจสอบ</p>
+                <h2 id="fe-rule-8">8. การคำนวณต้องทำที่ Backend</h2>
+                <p>หลีกเลี่ยงการคำนวณหรือการตรวจสอบข้อมูลที่ซับซ้อนที่ฝั่ง Frontend. ให้ส่งข้อมูลดิบที่จำเป็นไปให้ Backend เป็นผู้ประมวลผลและตรวจสอบ แล้วรอรับผลลัพธ์กลับมาเพื่อความปลอดภัยและความถูกต้องของข้อมูล.</p>
             </div>
 
             <hr>
             
             <div class="rule-section">
-                <h2 id="fe-rule-9">9. ตรวจสอบขนาดของอาร์เรย์ก่อนประมวลผล</h2>
-                <p>ก่อนเข้าถึงข้อมูลใน Array หรือ Object ควรตรวจสอบก่อนเสมอว่ามีข้อมูลอยู่จริงหรือไม่ เพื่อป้องกันข้อผิดพลาด <code>null/undefined reference</code> แนะนำให้ใช้ฟังก์ชันกลางเช่น <code>isEmpty()</code></p>
+                <h2 id="fe-rule-9">9. ตรวจสอบ Array/Object ก่อนประมวลผล</h2>
+                <p>ก่อนเข้าถึงข้อมูลใน Array หรือ Object ควรตรวจสอบก่อนเสมอว่ามีข้อมูลอยู่จริงหรือไม่ (ไม่ใช่ <code>null</code> หรือ <code>undefined</code>) เพื่อป้องกันข้อผิดพลาด <code>null reference</code> แนะนำให้ใช้ฟังก์ชันกลางที่เตรียมไว้ให้ เช่น <code>isEmpty()</code>.</p>
             </div>
 
             <hr>
             
             <div class="rule-section">
                 <h2 id="fe-rule-10">10. ไม่เขียน Style ในไฟล์ HTML</h2>
-                <p>ห้ามเขียน CSS ในไฟล์ HTML โดยตรง (ไม่ว่าจะเป็น <code>&lt;style&gt;</code> หรือ inline <code>style="..."</code>) ให้เขียน Style ทั้งหมดในไฟล์ <code>.scss</code> ที่แยกไว้ต่างหาก</p>
+                <p>ห้ามเขียน CSS ในไฟล์ HTML โดยตรง ไม่ว่าจะใช้แท็ก <code>&lt;style&gt;</code> หรือ inline attribute <code>style="..."</code> ก็ตาม ให้เขียน Style ทั้งหมดในไฟล์ <code>.scss</code> ที่แยกไว้ต่างหากเสมอ.</p>
             </div>
             
             <hr>
             
             <div class="rule-section">
-                <h2 id="fe-rule-11">11. ไม่ทำ Operation ที่ซับซ้อนใน HTML</h2>
-                <p>หลีกเลี่ยงการเขียนเงื่อนไขหรือ Operation ที่ซับซ้อนใน Template ควรย้าย Logic ไปไว้ในฟังก์ชันของ Component แล้วเรียกใช้จาก Template</p>
+                <h2 id="fe-rule-11">11. ไม่เขียน Logic ที่ซับซ้อนใน HTML Template</h2>
+                <p>หลีกเลี่ยงการเขียนเงื่อนไขหรือ Operation ที่ซับซ้อนใน Template ควรย้าย Logic เหล่านั้นไปไว้ในฟังก์ชันของ Component แล้วเรียกใช้จาก Template แทน.</p>
                 <div class="note">
-                    <p><b>ผิด:</b> <code>*ngIf="checked == 'Y' ? true : false"</code></p>
-                    <p><b>ถูก:</b> <code>*ngIf="isChecked(checked)"</code></p>
+                    <p><b>ตัวอย่างที่ไม่ดี:</b> <code>*ngIf="checked == 'Y' ? true : false"</code></p>
+                    <p><b>ตัวอย่างที่ดี:</b> <code>*ngIf="isChecked(checked)"</code> โดยที่ <code>isChecked()</code> เป็นฟังก์ชันในไฟล์ <code>.ts</code></p>
                 </div>
             </div>
             
             <hr>
 
             <div class="rule-section">
-                <h2 id="fe-rule-12">12. ไม่เขียนโค้ดซ้ำกัน (DRY)</h2>
-                <p>ควรแยกฟังก์ชันที่ทำงานเหมือนกันออกมาเป็นฟังก์ชันกลางที่เรียกใช้ซ้ำได้ และใช้ Component, Service และ Utility ที่มีอยู่แล้วให้เกิดประโยชน์สูงสุด เช่น</p>
+                <h2 id="fe-rule-12">12. ลดการเขียนโค้ดซ้ำ (DRY - Don't Repeat Yourself)</h2>
+                <p>ควรแยกฟังก์ชันที่มีการทำงานเหมือนกันออกมาเป็นฟังก์ชันกลางที่เรียกใช้ซ้ำได้ และใช้ Component, Service และ Utility ที่สร้างไว้แล้วให้เกิดประโยชน์สูงสุด.</p>
                 <ul>
-                    <li>ใช้ <code>&lt;textbox&gt;</code> แทน <code>&lt;input&gt;</code></li>
-                    <li>ใช้ <code>&lt;areabox&gt;</code> แทน <code>&lt;textarea&gt;</code></li>
-                    <li>ใช้ <code>&lt;number&gt;</code> แทน <code>&lt;input type="number"&gt;</code></li>
+                    <li><strong>ใช้ Utility Function:</strong> สร้างฟังก์ชันสำหรับงานที่ทำบ่อยๆ เช่น การดาวน์โหลดไฟล์.</li>
+                    <li><strong>ใช้ Component กลาง:</strong> สำหรับ UI Elements ทั่วไป ให้ใช้ Component ที่สร้างไว้ให้แล้ว เช่น <code>&lt;textbox&gt;</code>, <code>&lt;areabox&gt;</code>, หรือ <code>&lt;number&gt;</code> แทนการใช้แท็ก HTML พื้นฐาน เพื่อให้มั่นใจว่า UI และการทำงานสอดคล้องกันทั่วทั้งแอปพลิเคชัน.</li>
                 </ul>
             </div>
 
             <hr>
             
             <div class="rule-section">
-                <h2 id="fe-rule-13">13. Check null ทุกครั้งใน Object ที่มีความเสี่ยง</h2>
-                <p>เช่นเดียวกับข้อ 9, ควรตรวจสอบ Object หรือ Array ว่าเป็น null หรือ empty หรือไม่ก่อนใช้งานเสมอ โดยใช้ฟังก์ชันกลางเช่น <code>isEmpty()</code></p>
+                <h2 id="fe-rule-13">13. Check Null ใน Object ที่มีความเสี่ยงเสมอ</h2>
+                <p>เช่นเดียวกับข้อ 9, ควรตรวจสอบ Object หรือ Array ว่าเป็น null หรือ empty หรือไม่ก่อนใช้งานเสมอ โดยใช้ฟังก์ชันกลางเช่น <code>isEmpty()</code>.</p>
             </div>
 
             <hr>
             
             <div class="rule-section">
                 <h2 id="fe-rule-14">14. ครอบ Try-Catch ในฟังก์ชันที่สำคัญ</h2>
-                <p>ฟังก์ชันที่มีการดำเนินการกับข้อมูล เช่น การบันทึก (save), การลบ (delete), การอัปเดต (update) หรือการคำนวณที่สำคัญ ควรถูกครอบด้วย <code>try-catch</code> block เสมอ</p>
+                <p>ฟังก์ชันที่มีการดำเนินการกับข้อมูล เช่น การบันทึก (save), การลบ (delete), การอัปเดต (update) หรือการคำนวณที่สำคัญ ควรถูกครอบด้วย <code>try-catch</code> block เสมอเพื่อดักจับและจัดการข้อผิดพลาดที่อาจเกิดขึ้น.</p>
             </div>
             
             <hr>
 
             <div class="rule-section">
                 <h2 id="fe-rule-15">15. ใช้การแปลภาษา (i18n)</h2>
-                <p>ห้าม Hardcode ข้อความลงในโค้ดโดยตรง ให้ใช้ระบบการแปลภาษา โดยดึงข้อความจากฐานข้อมูลผ่าน key</p>
+                <p>ห้าม Hardcode ข้อความที่เป็นภาษาต่างๆ ลงในโค้ดโดยตรง ให้ใช้ระบบการแปลภาษา โดยดึงข้อความจากฐานข้อมูลผ่าน key.</p>
                  <div class="note">
                     <p><b>ในไฟล์ .html:</b> ใช้ <code>translate</code> pipe เช่น <code>{{ "label.RDMS01.DefineDecoration" | translate }}</code></p>
                     <p><b>ในไฟล์ .ts:</b> ใช้ key กับ Message Service เช่น <code>this.ms.warning("message.PleaseFillSaving")</code></p>
                 </div>
             </div>
-
         </section>
     </div>
 </body>
 </html>
+
 
   <!-- {
     "ref_id": "BE-12",

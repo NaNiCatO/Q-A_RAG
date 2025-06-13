@@ -35,7 +35,7 @@
     "content_th": "**รูปแบบการตั้งชื่อ:** ให้ยึดตามมาตรฐานการตั้งชื่อของ C# โดยใช้ PascalCase สำหรับคลาส, เมธอด, property และ field (เช่น `LeaveRequest`, `SaveData()`, `EmployeeId`) และใช้ camelCase สำหรับตัวแปรภายในเมธอด (เช่น `leaveType`, `totalCount`)"
   },
   {
-    "แนref_id": "BE-8",
+    "ref_id": "BE-8",
     "content": "**Class and File Naming Consistency:** Ensure that the class name matches its corresponding file name and that the namespace accurately reflects the folder structure. For example, a class named `Detail` should be in a file named `Detail.cs` within a namespace like `Application.Features.ORTS02`.",
     "content_th": "**ความสอดคล้องของชื่อคลาสและไฟล์:** ตรวจสอบให้แน่ใจว่าชื่อคลาสตรงกับชื่อไฟล์ และ namespace สอดคล้องกับโครงสร้างของโฟลเดอร์ ตัวอย่างเช่น คลาสชื่อ `Detail` ควรอยู่ในไฟล์ชื่อ `Detail.cs` และอยู่ภายใน namespace เช่น `Application.Features.ORTS02`"
   },
