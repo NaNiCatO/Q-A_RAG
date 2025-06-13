@@ -95,7 +95,6 @@
 
         const API_URL = "http://127.0.0.1:8000/api/ask";
 
-        // --- NEW: HTML Escaping Function ---
         function escapeHtml(text) {
             if (typeof text !== 'string') return '';
             return text
@@ -154,11 +153,11 @@
         }
 
         function displayResults(data) {
-            // Display Summary (escaping for safety)
+            // Display Summary
             summaryOutput.innerHTML = `<p>${escapeHtml(data.summary)}</p>`;
             summarySection.classList.remove('hidden');
 
-            // Display Detailed Explanation (escaping and handling newlines)
+            // Display Detailed Explanation
             explanationOutput.innerHTML = escapeHtml(data.detailed_explanation).replace(/\n/g, '<br>');
             explanationSection.classList.remove('hidden');
 
@@ -172,15 +171,33 @@
                         ? `<span class="text-green-600 font-bold">✔ Relevant</span>`
                         : `<span class="text-red-600 font-bold">✖ Not Relevant</span>`;
 
-                    // FIXED: Escape the content before setting innerHTML
                     const escapedContent = escapeHtml(rule.content);
                     const escapedReasoning = escapeHtml(rule.reasoning);
+
+                    // --- MODIFICATION START: Link to the single standards.html file ---
+                    const ruleId = rule.rule_id; // e.g., "BE-8" or "FE-4"
+                    const parts = ruleId.split('-');
+                    let ruleLink = '';
+                    let ruleIdHtml = `<strong class="text-gray-800">[Rule ID: ${escapeHtml(ruleId)}]</strong>`;
+
+                    if (parts.length === 2) {
+                        const type = parts[0].toLowerCase(); // 'be' or 'fe'
+                        const number = parts[1];
+                        // Point to the single new file and the new anchor format
+                        ruleLink = `standards.html#${type}-rule-${number}`;
+                    }
+
+                    if (ruleLink) {
+                        ruleIdHtml = `<a href="${ruleLink}" target="_blank" class="text-blue-600 hover:underline font-bold">[Rule ID: ${escapeHtml(ruleId)}]</a>`;
+                    }
+                    // --- MODIFICATION END ---
+
 
                     const ruleDiv = document.createElement('div');
                     ruleDiv.className = `p-4 ${bgColor} border ${borderColor} rounded-lg`;
                     ruleDiv.innerHTML = `
                         <p class="prose prose-custom max-w-none">
-                            <strong class="text-gray-800">[Rule ID: ${rule.rule_id}]</strong>: ${escapedContent}
+                            ${ruleIdHtml}: ${escapedContent}
                         </p>
                         <p class="reasoning"><strong>AI Reasoning:</strong> ${escapedReasoning}</p>
                         <div class="text-right text-sm mt-2">${icon}</div>
