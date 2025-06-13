@@ -1,0 +1,26 @@
+# Dockerfile.api
+
+FROM python:3.10-slim
+WORKDIR /app
+
+# ---- NEW: Set the environment variable for the model cache ----
+# This ensures both the caching script and the final app use the same folder.
+ENV SENTENCE_TRANSFORMERS_HOME=/app/model_cache
+
+# Install dependencies first
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# ---- NEW: Copy and run the caching script ----
+# This will download the models and add them to a layer in the Docker image.
+# This step will be slow the first time you build.
+COPY cache_models.py .
+RUN python cache_models.py
+
+# Copy the rest of the application source code
+COPY api.py .
+COPY ingest_data.py .
+COPY knowledge_base_bilingual.json .
+
+EXPOSE 8000
+CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "8000"]

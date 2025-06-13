@@ -1,0 +1,10 @@
+# requirements.txt
+
+# Main API dependencies
+redis==5.0.4
+fastapi
+uvicorn[standard]
+requests
+python-dotenv
+sentence-transformers
+numpy

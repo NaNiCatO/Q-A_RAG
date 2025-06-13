@@ -1,0 +1,162 @@
+[
+  {
+    "ref_id": "BE-1",
+    "content": "**Logging Standards:** Implement comprehensive logging for tracking and debugging. Use the `Info` level for parameters and process steps (Start, Success/End) and the `Error` level for exceptions. Each function must include `Start`, `End`, and `Error` log points. For handlers, use the class or handler name in the log message. Log SQL parameters before execution.",
+    "content_th": "**มาตรฐานการบันทึก Log:** ให้บันทึก Log อย่างครอบคลุมเพื่อการติดตามและแก้ไขข้อบกพร่อง ใช้ระดับ `Info` สำหรับพารามิเตอร์และขั้นตอนการทำงาน (เริ่มต้น, สำเร็จ/สิ้นสุด) และใช้ระดับ `Error` สำหรับ Exception ทุกฟังก์ชันต้องมีจุดบันทึก Log 'Start', 'End' และ 'Error' สำหรับ handler ให้ใช้ชื่อคลาสหรือ handler ในข้อความ Log และให้บันทึกพารามิเตอร์ของ SQL ก่อนการประมวลผล"
+  },
+  {
+    "ref_id": "BE-2",
+    "content": "**Use AddRange for Bulk Inserts:** When adding multiple records that match an entity, loop through the source data, map them to new entity objects, and add them to a `List<>`. Then, use `_context.Set<>().AddRangeAsync()` to perform an efficient bulk insert. This method is only for adding new data, not for updates.",
+    "content_th": "**ใช้ AddRange สำหรับการเพิ่มข้อมูลจำนวนมาก:** เมื่อต้องการเพิ่มข้อมูลหลายรายการที่ตรงกับ Entity ให้วนลูปข้อมูลต้นทางเพื่อสร้างอ็อบเจกต์ Entity ใหม่ แล้วเพิ่มลงใน `List<>` จากนั้นใช้ `_context.Set<>().AddRangeAsync()` เพื่อเพิ่มข้อมูลทั้งหมดลงในฐานข้อมูลอย่างมีประสิทธิภาพในครั้งเดียว วิธีนี้ใช้สำหรับการเพิ่มข้อมูลใหม่เท่านั้น ไม่สามารถใช้กับการอัปเดตได้"
+  },
+  {
+    "ref_id": "BE-3",
+    "content": "**Universal Try-Catch Blocks:** Enclose all method logic within a `try-catch` block. In the `catch(Exception ex)` block, always re-throw the exception using `throw new Exception(ex.Message);` as the final statement to ensure errors are propagated up the call stack.",
+    "content_th": "**การใช้ Try-Catch ในทุกเมธอด:** ให้ครอบโค้ดทั้งหมดในเมธอดด้วย `try-catch` บล็อก ในบล็อก `catch(Exception ex)` จะต้องมีการโยน Exception ต่อเสมอโดยใช้ `throw new Exception(ex.Message);` เป็นคำสั่งสุดท้ายเพื่อให้แน่ใจว่าข้อผิดพลาดจะถูกส่งต่อไปยังลำดับการเรียกถัดไป"
+  },
+  {
+    "ref_id": "BE-4",
+    "content": "**Perform Calculations on the Backend:** Avoid performing calculations on the frontend. The client should only send identifiers (e.g., a list of IDs). The backend is responsible for fetching the actual data from the database, performing all necessary calculations, and saving the result. This prevents client-side tampering of calculated values.",
+    "content_th": "**การคำนวณต้องทำที่ฝั่ง Backend:** หลีกเลี่ยงการคำนวณที่ฝั่ง Frontend โดยให้ Client ส่งแค่ข้อมูลระบุตัวตน (เช่น รายการ ID) มายัง Backend จากนั้น Backend จะมีหน้าที่ดึงข้อมูลจริงจากฐานข้อมูลมาทำการคำนวณที่จำเป็นทั้งหมด แล้วจึงบันทึกผลลัพธ์ ซึ่งจะช่วยป้องกันการแก้ไขค่าที่คำนวณแล้วจากฝั่ง Client"
+  },
+  {
+    "ref_id": "BE-5",
+    "content": "**Validate Required Fields on the Backend:** Before saving data, always validate required fields on the backend to ensure they are not null or empty, even if the frontend performs similar checks. This provides a critical security layer against direct API requests (e.g., from Postman). Throw an exception if a required field is missing.",
+    "content_th": "**ตรวจสอบฟิลด์ที่จำเป็นที่ Backend:** ก่อนบันทึกข้อมูล ให้ตรวจสอบฟิลด์ที่จำเป็นที่ฝั่ง Backend เสมอเพื่อให้แน่ใจว่าไม่ใช่ค่าว่างหรือไม่มีข้อมูล แม้ว่า Frontend จะมีการตรวจสอบอยู่แล้วก็ตาม นี่เป็นชั้นความปลอดภัยที่สำคัญเพื่อป้องกันการยิง request ตรงมาที่ API (เช่น จาก Postman) หากฟิลด์ที่จำเป็นขาดหายไปให้โยน Exception"
+  },
+  {
+    "ref_id": "BE-6",
+    "content": "**Validate Field Length:** Define field length constraints in the domain entities using the `[MaxLength(value)]` attribute to match the database schema. While this prevents overly long data, it does not prevent whitespace-only strings. For fields where whitespace is invalid, add explicit string validation checks.",
+    "content_th": "**ตรวจสอบความยาวของฟิลด์:** กำหนดข้อจำกัดความยาวของฟิลด์ใน Domain Entity โดยใช้ attribute `[MaxLength(value)]` ให้ตรงกับสคีมาของฐานข้อมูล แม้วิธีนี้จะป้องกันข้อมูลที่ยาวเกินไปได้ แต่ไม่สามารถป้องกันสตริงที่เป็นช่องว่างอย่างเดียวได้ สำหรับฟิลด์ที่ไม่อนุญาตให้มีค่าเป็นช่องว่าง ให้เพิ่มการตรวจสอบสตริงเพิ่มเติม"
+  },
+  {
+    "ref_id": "BE-7",
+    "content": "**Naming Conventions:** Adhere to standard C# naming conventions. Use PascalCase for classes, methods, properties, and fields (e.g., `LeaveRequest`, `SaveData()`, `EmployeeId`). Use camelCase for local variables within methods (e.g., `leaveType`, `totalCount`).",
+    "content_th": "**รูปแบบการตั้งชื่อ:** ให้ยึดตามมาตรฐานการตั้งชื่อของ C# โดยใช้ PascalCase สำหรับคลาส, เมธอด, property และ field (เช่น `LeaveRequest`, `SaveData()`, `EmployeeId`) และใช้ camelCase สำหรับตัวแปรภายในเมธอด (เช่น `leaveType`, `totalCount`)"
+  },
+  {
+    "ref_id": "BE-8",
+    "content": "**Class and File Naming Consistency:** Ensure that the class name matches its corresponding file name and that the namespace accurately reflects the folder structure. For example, a class named `Detail` should be in a file named `Detail.cs` within a namespace like `Application.Features.ORTS02`.",
+    "content_th": "**ความสอดคล้องของชื่อคลาสและไฟล์:** ตรวจสอบให้แน่ใจว่าชื่อคลาสตรงกับชื่อไฟล์ และ namespace สอดคล้องกับโครงสร้างของโฟลเดอร์ ตัวอย่างเช่น คลาสชื่อ `Detail` ควรอยู่ในไฟล์ชื่อ `Detail.cs` และอยู่ภายใน namespace เช่น `Application.Features.ORTS02`"
+  },
+  {
+    "ref_id": "BE-9",
+    "content": "**Use Constants for Fixed Values:** Define all fixed or 'magic' values (e.g., status strings like \"Y\" or \"N\") in dedicated static classes within the `Application.Common.Constants` namespace. This improves readability and maintainability by assigning meaningful names to these values, such as `ActiveStatus.Yes`.",
+    "content_th": "**ใช้ค่าคงที่สำหรับค่าที่ตายตัว:** กำหนดค่าที่ตายตัวหรือค่าที่ไม่มีความหมายในตัวเองทั้งหมด (เช่น สตริงสถานะ \"Y\" หรือ \"N\") ใน static class ที่จัดเตรียมไว้ใน namespace `Application.Common.Constants` ซึ่งจะช่วยเพิ่มความสามารถในการอ่านและบำรุงรักษาโค้ดโดยการตั้งชื่อที่มีความหมายให้กับค่าเหล่านั้น เช่น `ActiveStatus.Yes`"
+  },
+  {
+    "ref_id": "BE-10",
+    "content": "**Proper MemoryStream Management:** When handling file streams, always enclose the `MemoryStream` instantiation within a `using` statement. This ensures the stream is automatically closed and disposed of, preventing memory leaks. Before reading the stream with another process (e.g., `XLWorkbook`), reset its position to the beginning using `ms.Seek(0, SeekOrigin.Begin)`.",
+    "content_th": "**การจัดการ MemoryStream ที่ถูกต้อง:** เมื่อจัดการกับสตรีมไฟล์ ให้สร้าง `MemoryStream` ภายในบล็อก `using` เสมอ เพื่อให้แน่ใจว่าสตรีมจะถูกปิดและจัดการหน่วยความจำโดยอัตโนมัติ ซึ่งช่วยป้องกันปัญหาหน่วยความจำรั่วไหล ก่อนที่จะอ่านสตรีมด้วยกระบวนการอื่น (เช่น `XLWorkbook`) ให้ย้อนตำแหน่งการอ่านกลับไปที่จุดเริ่มต้นโดยใช้ `ms.Seek(0, SeekOrigin.Begin)`"
+  },
+  {
+    "ref_id": "BE-11",
+    "content": "**SQL Statement Formatting:** Format complex SQL queries in a `StringBuilder` using multi-line string literals (e.g., `sql.Append(@\"SELECT ... FROM ...\")`) instead of multiple `AppendLine()` calls. This approach makes the raw SQL statement easier to copy and debug directly in a database client.",
+    "content_th": "**การจัดรูปแบบคำสั่ง SQL:** จัดรูปแบบคำสั่ง SQL ที่ซับซ้อนใน `StringBuilder` โดยใช้สตริงหลายบรรทัด (เช่น `sql.Append(@\"SELECT ... FROM ...\")`) แทนการเรียก `AppendLine()` หลายๆ ครั้ง วิธีนี้ทำให้สามารถคัดลอกคำสั่ง SQL ไปทดสอบในโปรแกรมจัดการฐานข้อมูลได้ง่ายขึ้น"
+  },
+  {
+    "ref_id": "BE-12",
+    "content": "**Differentiate QueryAsync and ExecuteAsync:** Use `_context.QueryAsync<T>()` for read operations (SELECT) that return data, resulting in an `IEnumerable<T>`. Use `_context.ExecuteAsync()` for write operations (INSERT, UPDATE, DELETE) that modify data, which returns an integer representing the number of affected rows.",
+    "content_th": "**ความแตกต่างระหว่าง QueryAsync และ ExecuteAsync:** ใช้ `_context.QueryAsync<T>()` สำหรับการดำเนินการอ่านข้อมูล (SELECT) ที่ต้องการผลลัพธ์เป็นข้อมูล ซึ่งจะคืนค่าเป็น `IEnumerable<T>` ในขณะที่ใช้ `_context.ExecuteAsync()` สำหรับการดำเนินการเขียนข้อมูล (INSERT, UPDATE, DELETE) ซึ่งจะคืนค่าเป็นจำนวนเต็มที่ระบุจำนวนแถวที่ได้รับผลกระทบ"
+  },
+  {
+    "ref_id": "BE-13",
+    "content": "**Log SQL Queries:** In addition to standard process logging, always log the complete SQL query string immediately before it is executed. Use an info-level logger with a clear format, such as `_logger.LogInformation(\"[MethodName] SQL => {SqlQuery}\", sql.ToString());`, to simplify debugging.",
+    "content_th": "**บันทึก Log คำสั่ง SQL:** นอกเหนือจากการบันทึก Log การทำงานปกติ ให้บันทึกสตริงคำสั่ง SQL ฉบับเต็มก่อนที่จะสั่งประมวลผลเสมอ โดยใช้ logger ระดับ info ในรูปแบบที่ชัดเจน เช่น `_logger.LogInformation(\"[MethodName] SQL => {SqlQuery}\", sql.ToString());` เพื่อให้การแก้ไขข้อบกพร่องง่ายขึ้น"
+  },
+  {
+    "ref_id": "BE-14",
+    "content": "**Validate File Types:** Always validate the type of uploaded files on the backend to ensure they match the required format (e.g., PDF, Excel, image). Implement specific validation logic for each file type, such as checking file headers or attempting to process the file with a relevant library within a try-catch block.",
+    "content_th": "**ตรวจสอบประเภทไฟล์:** ให้ตรวจสอบประเภทของไฟล์ที่อัปโหลดบนฝั่ง Backend เสมอเพื่อให้แน่ใจว่าเป็นรูปแบบที่ต้องการ (เช่น PDF, Excel, รูปภาพ) โดยใช้วิธีการตรวจสอบที่เหมาะสมสำหรับแต่ละประเภทไฟล์ เช่น การตรวจสอบส่วนหัวของไฟล์ หรือลองประมวลผลไฟล์ด้วยไลบรารีที่เกี่ยวข้องภายในบล็อก try-catch"
+  },
+  {
+    "ref_id": "BE-15",
+    "content": "**Check for Null or Empty Arrays:** Before iterating over a collection or array using methods like `foreach`, always check if it is not null and contains elements (e.g., `if (items != null && items.Any())`). This simple check prevents `NullReferenceException` when the collection is empty.",
+    "content_th": "**ตรวจสอบอาร์เรย์ก่อนใช้งาน:** ก่อนที่จะวนลูปในคอลเลกชันหรืออาร์เรย์ด้วย `foreach` ให้ตรวจสอบก่อนเสมอว่าข้อมูลนั้นไม่ใช่ `null` และมีสมาชิกอยู่ (เช่น `if (items != null && items.Any())`) การตรวจสอบง่ายๆ นี้จะช่วยป้องกันการเกิด `NullReferenceException` เมื่อคอลเลกชันว่างเปล่า"
+  },
+  {
+    "ref_id": "BE-16",
+    "content": "**Check for Null Objects Before Accessing Properties:** When working with an object that might be null (e.g., an entity fetched from the database), use the null-conditional operator (`?.`) to safely access its properties without causing a `NullReferenceException`. For example, use `if (emp?.MainDept != null)` before using the property.",
+    "content_th": "**ตรวจสอบอ็อบเจกต์ Null ก่อนเข้าถึง Property:** เมื่อทำงานกับอ็อบเจกต์ที่อาจเป็น `null` (เช่น entity ที่ดึงจากฐานข้อมูล) ให้ใช้ null-conditional operator (`?.`) เพื่อเข้าถึง property อย่างปลอดภัยและป้องกันการเกิด `NullReferenceException` ตัวอย่างเช่น ใช้ `if (emp?.MainDept != null)` ก่อนที่จะใช้ property นั้น"
+  },
+  {
+    "ref_id": "BE-17",
+    "content": "**Single Master File Per Module:** Each module should contain only one `Master.cs` file for handling all master data lookups (e.g., for dropdown lists). This file should use a `switch` statement based on a request parameter to determine which data to fetch and return, avoiding the creation of multiple master files like `MasterDetail.cs`.",
+    "content_th": "**ใช้ Master.cs เพียงไฟล์เดียวต่อโมดูล:** แต่ละโมดูลควรมีไฟล์ `Master.cs` เพียงไฟล์เดียวสำหรับจัดการการดึงข้อมูลหลักทั้งหมด (เช่น ข้อมูลสำหรับ dropdown) โดยไฟล์นี้ควรใช้ `switch` statement จากพารามิเตอร์ที่ส่งมาเพื่อกำหนดว่าจะดึงข้อมูลใด แทนที่จะสร้างไฟล์ master หลายๆ ไฟล์เช่น `MasterDetail.cs`"
+  },
+  {
+    "ref_id": "FE-1",
+    "content": "**Component Naming and Reusability:** Name components logically according to the functional specification. For pages that share add and detail views, create a single detail component (e.g., `feature-detail.component.ts`) and use a boolean flag like `isEdit` to toggle UI states, rather than creating separate components for each mode.",
+    "content_th": "**การตั้งชื่อและการใช้ซ้ำ Component:** ตั้งชื่อ component ตามเอกสาร functional spec สำหรับหน้าที่มีมุมมองการเพิ่มและดูรายละเอียดที่ใช้ร่วมกัน ให้สร้างเป็น detail component เพียงไฟล์เดียว (เช่น `feature-detail.component.ts`) แล้วใช้แฟล็กประเภท boolean อย่าง `isEdit` เพื่อสลับสถานะของ UI แทนที่จะสร้าง component แยกกันสำหรับแต่ละโหมด"
+  },
+  {
+    "ref_id": "FE-2",
+    "content": "**Component Lifecycle Implementation:** Every component must extend the `SubscriptionDisposer` base class and call `super()` in its `constructor`. If using the `ngOnInit` hook, the class must also `implements OnInit`. When overriding `ngOnDestroy`, perform any necessary cleanup and ensure `super.ngOnDestroy()` is the final statement in the method.",
+    "content_th": "**การ Implement Component Lifecycle:** ทุก component จะต้อง `extends` คลาส `SubscriptionDisposer` และเรียก `super()` ใน `constructor` หากมีการใช้งาน `ngOnInit` คลาสจะต้อง `implements OnInit` ด้วย และเมื่อทำการ `override ngOnDestroy` ให้จัดการล้างค่าต่างๆ ที่จำเป็นและต้องมั่นใจว่า `super.ngOnDestroy()` ถูกเรียกเป็นคำสั่งสุดท้ายในเมธอดเสมอ"
+  },
+  {
+    "ref_id": "FE-3",
+    "content": "**Use Enums for Constants:** Define recurring, specific values like API paths or status names as constants using a TypeScript `enum`. Import and use these enums throughout the application to ensure consistency, improve readability, and avoid hardcoded strings.",
+    "content_th": "**ใช้ Enum สำหรับค่าคงที่:** กำหนดค่าที่ใช้ซ้ำๆ เช่น เส้นทาง API หรือชื่อสถานะ ให้เป็นค่าคงที่โดยใช้ `enum` ของ TypeScript จากนั้น import มาใช้งานทั่วทั้งแอปพลิเคชันเพื่อความสอดคล้อง เพิ่มความสามารถในการอ่านโค้ด และหลีกเลี่ยงการใช้สตริงที่ฮาร์ดโค้ด"
+  },
+  {
+    "ref_id": "FE-4",
+    "content": "**Standard Observable Subscription Format:** When subscribing to an Observable, always use the observer object format with `next` and `error` handlers. This ensures that both success and error paths are explicitly and clearly handled for all asynchronous operations.",
+    "content_th": "**รูปแบบการ Subscribe Observable:** เมื่อทำการ subscribe Observable ให้ใช้รูปแบบ observer object ที่มี `next` และ `error` เสมอ เพื่อให้แน่ใจว่ามีการจัดการทั้งกรณีที่สำเร็จและกรณีที่เกิดข้อผิดพลาดอย่างชัดเจนสำหรับการทำงานแบบอะซิงโครนัสทั้งหมด"
+  },
+  {
+    "ref_id": "FE-5",
+    "content": "**Define API Paths as Constants:** All API endpoint paths used in services must be defined as constants within a dedicated `enum`. This approach centralizes path management, prevents typos, and avoids the maintenance issues associated with hardcoded URLs.",
+    "content_th": "**กำหนด Path ของ API เป็นค่าคงที่:** เส้นทาง API ทั้งหมดที่ใช้ใน service ต้องถูกกำหนดเป็นค่าคงที่ภายใน `enum` ที่จัดเตรียมไว้ วิธีนี้จะช่วยรวมศูนย์การจัดการ path, ป้องกันการพิมพ์ผิด และหลีกเลี่ยงปัญหาการบำรุงรักษาที่เกี่ยวข้องกับการฮาร์ดโค้ด URL"
+  },
+  {
+    "ref_id": "FE-6",
+    "content": "**Use Server-Side Date and Time:** Do not instantiate `new Date()` directly on the frontend, as this reflects the client's local time. Instead, inject a `DatetimeService` to fetch the current, authoritative time from the server via an API call. This ensures time consistency across all users.",
+    "content_th": "**ใช้วันที่และเวลาจากฝั่ง Server:** ห้ามสร้าง `new Date()` โดยตรงที่ฝั่ง Frontend เพราะจะเป็นการใช้เวลาของเครื่อง Client ให้ inject `DatetimeService` เพื่อดึงเวลาปัจจุบันที่ถูกต้องจาก Server ผ่าน API แทน เพื่อให้แน่ใจว่าเวลามีความสอดคล้องกันสำหรับผู้ใช้ทุกคน"
+  },
+  {
+    "ref_id": "FE-7",
+    "content": "**Use DatePipe for Date Formatting:** For all date formatting tasks, use Angular's built-in `DatePipe`. Add it to the component's `providers` array, inject it into the `constructor`, and then call `this.datePipe.transform()` to format date values consistently.",
+    "content_th": "**ใช้ DatePipe สำหรับการจัดรูปแบบวันที่:** สำหรับงานจัดรูปแบบวันที่ทั้งหมด ให้ใช้ `DatePipe` ที่มากับ Angular โดยเพิ่มเข้าไปใน `providers` ของ component, inject เข้าไปใน `constructor` จากนั้นเรียกใช้ `this.datePipe.transform()` เพื่อจัดรูปแบบค่าวันที่อย่างสอดคล้องกัน"
+  },
+  {
+    "ref_id": "FE-8",
+    "content": "**Delegate Validation to the Backend:** Do not implement complex business logic or sensitive calculations on the frontend. Send raw user data to the backend and let it perform all validation and processing. The frontend should simply display the outcome, treating the backend as the single source of truth.",
+    "content_th": "**ส่งการตรวจสอบที่ซับซ้อนไปให้ Backend:** ห้าม implement business logic หรือการคำนวณที่ละเอียดอ่อนไว้ที่ Frontend แต่ให้ส่งข้อมูลดิบจากผู้ใช้ไปให้ Backend เพื่อทำการตรวจสอบและประมวลผลทั้งหมด Frontend ควรทำหน้าที่เพียงแสดงผลลัพธ์โดยยึดว่า Backend เป็นแหล่งข้อมูลที่ถูกต้องเพียงแห่งเดียว"
+  },
+  {
+    "ref_id": "FE-9",
+    "content": "**Check Array Emptiness Before Processing:** Before attempting to process an array (e.g., with `forEach` or `map`), always check that it is not empty. Use a helper function like `isEmpty()` to check for both null and zero-length arrays to prevent runtime errors.",
+    "content_th": "**ตรวจสอบอาร์เรย์ก่อนประมวลผล:** ก่อนที่จะประมวลผลอาร์เรย์ (เช่น ด้วย `forEach` หรือ `map`) ให้ตรวจสอบเสมอว่าอาร์เรย์นั้นไม่ใช่ค่าว่าง ให้ใช้ฟังก์ชันตัวช่วยเช่น `isEmpty()` เพื่อตรวจสอบทั้งกรณีที่เป็น null และอาร์เรย์ที่มีความยาวเป็นศูนย์ เพื่อป้องกันข้อผิดพลาดขณะทำงาน"
+  },
+  {
+    "ref_id": "FE-10",
+    "content": "**Use External Stylesheets Only:** Avoid using inline `style` attributes and `<style>` blocks within HTML files. All CSS styling must be defined in external `.scss` or `.css` files to maintain a clean separation of concerns and improve code maintainability.",
+    "content_th": "**ใช้ Stylesheet ภายนอกเท่านั้น:** หลีกเลี่ยงการใช้ attribute `style` และแท็ก `<style>` ในไฟล์ HTML การจัดสไตล์ CSS ทั้งหมดต้องถูกกำหนดในไฟล์ `.scss` หรือ `.css` ภายนอก เพื่อแยกส่วนของโค้ดให้ชัดเจนและเพิ่มความสะดวกในการบำรุงรักษา"
+  },
+  {
+    "ref_id": "FE-11",
+    "content": "**Avoid Logic in HTML Templates:** Do not perform comparison operations or use ternary operators directly in the HTML template. Encapsulate this logic within a component method and call that method from the template. For example, convert `*ngIf=\"item.status === 'Y'\"` to `*ngIf=\"isActive(item)\"`. This keeps templates clean and logic testable.",
+    "content_th": "**ห้ามเขียน Logic ในไฟล์ HTML:** ห้ามทำการเปรียบเทียบหรือใช้ ternary operator โดยตรงใน template ของ HTML แต่ให้สร้างเป็นเมธอดใน component แล้วเรียกใช้จาก template แทน เช่น เปลี่ยนจาก `*ngIf=\"item.status === 'Y'\"` เป็น `*ngIf=\"isActive(item)\"` เพื่อให้ template สะอาดและสามารถทดสอบ Logic ได้"
+  },
+  {
+    "ref_id": "FE-12",
+    "content": "**Do Not Repeat Yourself (DRY):** Avoid code duplication by creating reusable components, services, and utility functions. For standard UI elements, use shared custom components like `<textbox>`, `<areabox>`, or `<number>` instead of native HTML input tags to ensure consistent behavior and styling.",
+    "content_th": "**อย่าเขียนโค้ดซ้ำซ้อน (DRY):** หลีกเลี่ยงการเขียนโค้ดซ้ำโดยการสร้าง component, service, และฟังก์ชันอรรถประโยชน์ที่สามารถนำกลับมาใช้ใหม่ได้ สำหรับองค์ประกอบ UI ทั่วไป ให้ใช้ custom component ที่สร้างไว้แล้ว เช่น `<textbox>`, `<areabox>`, หรือ `<number>` แทนแท็ก input ของ HTML ดั้งเดิม เพื่อให้มั่นใจได้ถึงการทำงานและสไตล์ที่สอดคล้องกัน"
+  },
+  {
+    "ref_id": "FE-13",
+    "content": "**Check for Null Objects Before Use:** Before using an object or array that may be null or undefined, such as data from an API response, always perform a null check. A utility function like `isEmpty()` can be used to prevent `null reference` errors, especially before iterating with methods like `forEach`.",
+    "content_th": "**ตรวจสอบ Null ก่อนใช้งานอ็อบเจกต์:** ก่อนใช้งานอ็อบเจกต์หรืออาร์เรย์ที่อาจเป็น `null` หรือ `undefined` เช่น ข้อมูลที่ได้จาก API ให้ทำการตรวจสอบค่าว่างก่อนเสมอ สามารถใช้ฟังก์ชันอรรถประโยชน์เช่น `isEmpty()` เพื่อป้องกันข้อผิดพลาด `null reference` โดยเฉพาะอย่างยิ่งก่อนการวนลูปด้วย `forEach`"
+  },
+  {
+    "ref_id": "FE-14",
+    "content": "**Use Try-Catch for Critical Synchronous Operations:** Enclose functions that perform critical operations like saving, updating, or deleting within a `try-catch` block. This is for handling unexpected synchronous errors, while asynchronous errors from subscriptions should be handled in the `error` callback.",
+    "content_th": "**ใช้ Try-Catch ครอบการทำงาน Synchronous ที่สำคัญ:** ให้ครอบฟังก์ชันที่ดำเนินการสำคัญ เช่น การบันทึก, อัปเดต, หรือลบ ด้วยบล็อก `try-catch` ซึ่งมีไว้สำหรับจัดการข้อผิดพลาดแบบ synchronous ที่ไม่คาดคิด ส่วนข้อผิดพลาดแบบ asynchronous จากการ subscribe ควรจัดการใน callback `error`"
+  },
+  {
+    "ref_id": "FE-15",
+    "content": "**Use Translation Keys for All User-Facing Text:** Do not hardcode any text that is visible to the user. Instead, use translation keys with the `translate` pipe in HTML (e.g., `{{ 'label.MyLabel' | translate }}`) or a message service in TypeScript (e.g., `this.ms.warning('message.MyMessage')`) to support internationalization.",
+    "content_th": "**ใช้ Translation Key สำหรับข้อความที่แสดงผลทั้งหมด:** ห้ามฮาร์ดโค้ดข้อความใดๆ ที่ผู้ใช้มองเห็น แต่ให้ใช้ translation key ร่วมกับ `translate` pipe ใน HTML (เช่น `{{ 'label.MyLabel' | translate }}`) หรือผ่าน message service ใน TypeScript (เช่น `this.ms.warning('message.MyMessage')`) เพื่อรองรับการแปลภาษา"
+  }
+]

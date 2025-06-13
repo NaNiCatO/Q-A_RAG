@@ -1,0 +1,49 @@
+# docker-compose.yml
+
+services:
+  # 1. Redis Vector Database Service
+  redis-stack:
+    image: redis/redis-stack-server:latest
+    container_name: redis_db
+    ports:
+      - "6379:6379" # For the API
+      - "8001:8001" # For the RedisInsight GUI
+    volumes:
+      - redis_data:/data
+    networks:
+      - rag_network
+
+  # 2. Backend API Service
+  rag-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: rag_api_server
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env # Loads environment variables from a .env file (e.g., GEMINI_API_KEY)
+    depends_on:
+      - redis-stack # Ensures Redis is started before the API
+    networks:
+      - rag_network
+
+  # 3. Frontend Web Server Service
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: rag_frontend_ui
+    ports:
+      - "8080:80" # Expose frontend on host port 8080
+    depends_on:
+      - rag-api # Ensures the API is ready before the frontend starts
+    networks:
+      - rag_network
+
+volumes:
+  redis_data:
+
+networks:
+  rag_network:
+    driver: bridge

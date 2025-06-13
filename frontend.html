@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Coding Standards Assistant</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sarabun:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'Sarabun', sans-serif;
+            scroll-behavior: smooth;
+        }
+        .prose-custom p, .prose-custom li { line-height: 1.7; }
+        .loader {
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #3b82f6;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .reasoning {
+            font-style: italic;
+            color: #6b7280; /* gray-500 */
+            border-left: 2px solid #d1d5db; /* gray-300 */
+            padding-left: 0.75rem;
+            margin-top: 0.5rem;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <div class="container mx-auto max-w-4xl p-4 sm:p-6 md:p-8">
+        
+        <header class="text-center mb-8">
+            <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">Smart Coding Standards Assistant</h1>
+            <p class="text-md text-gray-600">An intelligent guide using AI-powered analysis and structured answers.</p>
+        </header>
+
+        <main class="bg-white p-6 sm:p-8 rounded-2xl shadow-lg">
+
+            <div class="mb-8">
+                <label for="query-input" class="block text-lg font-semibold text-gray-800 mb-2">Ask a question:</label>
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <input type="text" id="query-input" placeholder="e.g., ใช้ ngOnDestroy อย่างไร" class="flex-grow p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200">
+                    <button id="submit-btn" class="bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-blue-700 transition duration-200 flex items-center justify-center shrink-0">
+                        <span id="btn-text">Get Answer</span>
+                        <div id="loader" class="loader hidden ml-2"></div>
+                    </button>
+                </div>
+            </div>
+
+            <div id="results-container" class="space-y-8">
+                <div id="error-message" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg" role="alert"></div>
+
+                <!-- Structured output sections -->
+                <div id="summary-section" class="hidden">
+                    <h2 class="text-2xl font-bold text-gray-900 border-b pb-2 mb-4">Summary</h2>
+                    <div id="summary-output" class="prose prose-custom max-w-none text-lg"></div>
+                </div>
+
+                <div id="explanation-section" class="hidden">
+                    <h2 class="text-2xl font-bold text-gray-900 border-b pb-2 mb-4">Detailed Explanation</h2>
+                    <div id="explanation-output" class="prose prose-custom max-w-none bg-blue-50 p-4 rounded-lg"></div>
+                </div>
+
+                <div id="relevance-section" class="hidden">
+                    <h2 class="text-2xl font-bold text-gray-900 border-b pb-2 mb-4">AI Relevance Analysis</h2>
+                    <p class="text-sm text-gray-500 mb-4">The AI analyzed the retrieved rules and made the following relevance decisions:</p>
+                    <div id="relevance-output" class="space-y-4"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const queryInput = document.getElementById('query-input');
+        const submitBtn = document.getElementById('submit-btn');
+        const btnText = document.getElementById('btn-text');
+        const loader = document.getElementById('loader');
+        
+        const errorMessage = document.getElementById('error-message');
+        const summarySection = document.getElementById('summary-section');
+        const summaryOutput = document.getElementById('summary-output');
+        const explanationSection = document.getElementById('explanation-section');
+        const explanationOutput = document.getElementById('explanation-output');
+        const relevanceSection = document.getElementById('relevance-section');
+        const relevanceOutput = document.getElementById('relevance-output');
+
+        const API_URL = "http://127.0.0.1:8000/api/ask";
+
+        // --- NEW: HTML Escaping Function ---
+        function escapeHtml(text) {
+            if (typeof text !== 'string') return '';
+            return text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        function setLoading(isLoading) {
+            submitBtn.disabled = isLoading;
+            queryInput.disabled = isLoading;
+            btnText.classList.toggle('hidden', isLoading);
+            loader.classList.toggle('hidden', !isLoading);
+        }
+
+        function hideAllSections() {
+            errorMessage.classList.add('hidden');
+            summarySection.classList.add('hidden');
+            explanationSection.classList.add('hidden');
+            relevanceSection.classList.add('hidden');
+        }
+
+        async function handleQuery() {
+            const question = queryInput.value.trim();
+            if (!question) {
+                showError("Please enter a question.");
+                return;
+            }
+
+            setLoading(true);
+            hideAllSections();
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ question: question })
+                });
+
+                if (!response.ok) {
+                    const errData = await response.json();
+                    throw new Error(errData.detail || `HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                displayResults(data.structured_answer);
+
+            } catch (error) {
+                console.error('Error:', error);
+                showError(`Failed to get answer: ${error.message}`);
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        function displayResults(data) {
+            // Display Summary (escaping for safety)
+            summaryOutput.innerHTML = `<p>${escapeHtml(data.summary)}</p>`;
+            summarySection.classList.remove('hidden');
+
+            // Display Detailed Explanation (escaping and handling newlines)
+            explanationOutput.innerHTML = escapeHtml(data.detailed_explanation).replace(/\n/g, '<br>');
+            explanationSection.classList.remove('hidden');
+
+            // Display Relevance Analysis
+            relevanceOutput.innerHTML = ''; // Clear previous
+            if (data.relevant_rules && data.relevant_rules.length > 0) {
+                data.relevant_rules.forEach(rule => {
+                    const bgColor = rule.is_relevant ? 'bg-green-50' : 'bg-red-50';
+                    const borderColor = rule.is_relevant ? 'border-green-200' : 'border-red-200';
+                    const icon = rule.is_relevant 
+                        ? `<span class="text-green-600 font-bold">✔ Relevant</span>`
+                        : `<span class="text-red-600 font-bold">✖ Not Relevant</span>`;
+
+                    // FIXED: Escape the content before setting innerHTML
+                    const escapedContent = escapeHtml(rule.content);
+                    const escapedReasoning = escapeHtml(rule.reasoning);
+
+                    const ruleDiv = document.createElement('div');
+                    ruleDiv.className = `p-4 ${bgColor} border ${borderColor} rounded-lg`;
+                    ruleDiv.innerHTML = `
+                        <p class="prose prose-custom max-w-none">
+                            <strong class="text-gray-800">[Rule ID: ${rule.rule_id}]</strong>: ${escapedContent}
+                        </p>
+                        <p class="reasoning"><strong>AI Reasoning:</strong> ${escapedReasoning}</p>
+                        <div class="text-right text-sm mt-2">${icon}</div>
+                    `;
+                    relevanceOutput.appendChild(ruleDiv);
+                });
+                relevanceSection.classList.remove('hidden');
+            }
+        }
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.classList.remove('hidden');
+        }
+
+        submitBtn.addEventListener('click', handleQuery);
+        queryInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleQuery();
+        });
+    </script>
+</body>
+</html>

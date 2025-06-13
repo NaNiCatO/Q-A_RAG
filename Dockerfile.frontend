@@ -1,0 +1,8 @@
+# Dockerfile.frontend
+
+# Use the official lightweight Nginx image
+FROM nginx:alpine
+
+# Copy the static HTML file into the default Nginx public directory
+# Rename it to index.html so it's served by default
+COPY frontend.html /usr/share/nginx/html/index.html
