@@ -14,3 +14,6 @@ env/
 
 # Docker cache
 .dockerignore
+
+output/
+checkpoints/

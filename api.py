@@ -31,24 +31,30 @@ app.add_middleware(
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
+
+model_path1 = './trainning/output/my-finetuned-model-v1'
+model_path2 = './trainning/output/my-finetuned-cross-encoder-v1'
+
 # --- Model Loading ---
 print("Loading sentence-transformer model for retrieval...")
 # This model is for turning the query into a vector (retrieval)
-retrieval_model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
+# retrieval_model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
+retrieval_model = SentenceTransformer(model_path1)
 print("Retrieval model loaded.")
 
 # UPDATED: Swapped the English-centric model for a powerful multilingual one.
 print("Loading Multilingual Cross-Encoder model for re-ranking...")
 # This model is specifically designed for multilingual relevance scoring.
-rerank_model = CrossEncoder('cross-encoder/mmarco-mMiniLMv2-L12-H384-v1')
+# rerank_model = CrossEncoder('cross-encoder/mmarco-mMiniLMv2-L12-H384-v1')
+rerank_model = CrossEncoder(model_path2)
 print("Re-ranking model loaded.")
 
 
 print("Connecting to Redis...")
 try:
-    # r = redis.Redis(host='localhost', port=6379, decode_responses=True)
+    r = redis.Redis(host='localhost', port=6379, decode_responses=True)
     # Connect to the redis-stack service defined in docker-compose.yml
-    r = redis.Redis(host='redis-stack', port=6379, decode_responses=True)
+    # r = redis.Redis(host='redis-stack', port=6379, decode_responses=True)
     r.ping()
     print("Successfully connected to Redis.")
 except redis.exceptions.ConnectionError as e:
@@ -211,7 +217,7 @@ def generate_structured_llm_response(question: str, detected_language: str, cont
         You are a smart code standards assistant. You will be given a user's question and a list of potentially relevant coding standard rules.
 
         Your task is to analyze every single rule and provide a structured JSON output. Follow these steps precisely:
-        1.  Analyze the user's QUESTION.
+        1.  Analyze the USER'S QUESTION.
         2.  For EACH of the PROVIDED RULES, you must make a determination. The 'relevant_rules' array in your final JSON output MUST contain one object for EACH of the PROVIDED RULES.
         3.  After evaluating all rules, construct a final 'summary' and 'detailed_explanation' using ONLY the rules you marked as relevant (is_relevant: true). If no rules are relevant, state that clearly in the summary and explanation.
         4.  Format your entire output as a single, valid JSON object with the specified structure.

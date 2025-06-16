@@ -41,7 +41,7 @@
   },
   {
     "ref_id": "BE-9",
-    "content": "**Use Constants for Fixed Values:** Define all fixed or 'magic' values (e.g., status strings like \"Y\" or \"N\") in dedicated static classes within the `Application.Common.Constants` namespace. This improves readability and maintainability by assigning meaningful names to these values, such as `ActiveStatus.Yes`.",
+    "content": "**In Backend Use Constants for Fixed Values:** For In Backend Define all fixed or 'magic' values (e.g., status strings like \"Y\" or \"N\") in dedicated static classes within the `Application.Common.Constants` namespace. This improves readability and maintainability by assigning meaningful names to these values, such as `ActiveStatus.Yes`.",
     "content_th": "**ใช้ค่าคงที่สำหรับค่าที่ตายตัว:** กำหนดค่าที่ตายตัวหรือค่าที่ไม่มีความหมายในตัวเองทั้งหมด (เช่น สตริงสถานะ \"Y\" หรือ \"N\") ใน static class ที่จัดเตรียมไว้ใน namespace `Application.Common.Constants` ซึ่งจะช่วยเพิ่มความสามารถในการอ่านและบำรุงรักษาโค้ดโดยการตั้งชื่อที่มีความหมายให้กับค่าเหล่านั้น เช่น `ActiveStatus.Yes`"
   },
   {
