@@ -54,15 +54,15 @@ def load_knowledge_base():
 # --- 2. INITIALIZE MODEL AND REDIS CONNECTION ---
 print("Loading sentence-transformer model...")
 # model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
-model_path = './trainning/output/my-finetuned-model-v1'
+model_path = './training/output/my-finetuned-model-v1'
 
 model = SentenceTransformer(model_path)
 print("Model loaded.")
 
 try:
-    r = redis.Redis(host='localhost', port=6379, decode_responses=True)
+    # r = redis.Redis(host='localhost', port=6379, decode_responses=True)
     # Connect to the redis-stack service defined in docker-compose.yml
-    # r = redis.Redis(host='redis-stack', port=6379, decode_responses=True)
+    r = redis.Redis(host='redis-stack', port=6379, decode_responses=True)
     r.ping()
     print("Successfully connected to Redis.")
 except redis.exceptions.ConnectionError as e:

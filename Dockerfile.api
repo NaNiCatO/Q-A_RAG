@@ -3,19 +3,22 @@
 FROM python:3.10-slim
 WORKDIR /app
 
-# ---- NEW: Set the environment variable for the model cache ----
-# This ensures both the caching script and the final app use the same folder.
-ENV SENTENCE_TRANSFORMERS_HOME=/app/model_cache
 
 # Install dependencies first
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# ---- NEW: Copy and run the caching script ----
-# This will download the models and add them to a layer in the Docker image.
-# This step will be slow the first time you build.
-COPY cache_models.py .
-RUN python cache_models.py
+# --- DELETED ---
+# We no longer need the caching script or the ENV variable
+# COPY cache_models.py .
+# RUN python cache_models.py
+# ENV SENTENCE_TRANSFORMERS_HOME=/app/model_cache
+
+# --- ADDED ---
+# Copy your entire local 'training' directory into the container's /app/training directory.
+# This makes the models available at the paths specified in api.py.
+# Ensure your 'training' folder is in the same directory as this Dockerfile.
+COPY ./training /app/training
 
 # Copy the rest of the application source code
 COPY api.py .

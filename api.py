@@ -32,8 +32,8 @@ app.add_middleware(
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 
-model_path1 = './trainning/output/my-finetuned-model-v1'
-model_path2 = './trainning/output/my-finetuned-cross-encoder-v1'
+model_path1 = './training/output/my-finetuned-model-v1'
+model_path2 = './training/output/my-finetuned-cross-encoder-v1'
 
 # --- Model Loading ---
 print("Loading sentence-transformer model for retrieval...")
@@ -52,9 +52,9 @@ print("Re-ranking model loaded.")
 
 print("Connecting to Redis...")
 try:
-    r = redis.Redis(host='localhost', port=6379, decode_responses=True)
+    # r = redis.Redis(host='localhost', port=6379, decode_responses=True)
     # Connect to the redis-stack service defined in docker-compose.yml
-    # r = redis.Redis(host='redis-stack', port=6379, decode_responses=True)
+    r = redis.Redis(host='redis-stack', port=6379, decode_responses=True)
     r.ping()
     print("Successfully connected to Redis.")
 except redis.exceptions.ConnectionError as e:
@@ -245,7 +245,14 @@ def generate_structured_llm_response(question: str, detected_language: str, cont
     """
     
     api_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={GEMINI_API_KEY}"
-    payload = {"contents": [{"role": "user", "parts": [{"text": prompt}]}]}
+    payload = {
+        "contents": [{"role": "user", "parts": [{"text": prompt}]}],
+        "generationConfig": {
+            "temperature": 0.0,
+            "topP": 1.0,
+            "topK": 1
+        }
+    }
 
     try:
         response = requests.post(api_url, json=payload, timeout=180)

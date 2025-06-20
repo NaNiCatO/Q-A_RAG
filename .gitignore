@@ -17,3 +17,6 @@ env/
 
 output/
 checkpoints/
+
+evaluate_rag_gemini.py
+manual_rag_test_set.csv

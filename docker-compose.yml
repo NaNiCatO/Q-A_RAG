@@ -1,4 +1,4 @@
-# docker-compose.yml
+# docker-compose.yml (Optimized Version)
 
 services:
   # 1. Redis Vector Database Service
@@ -6,8 +6,8 @@ services:
     image: redis/redis-stack-server:latest
     container_name: redis_db
     ports:
-      - "6379:6379" # For the API
-      - "8001:8001" # For the RedisInsight GUI
+      - "6379:6379"
+      - "8001:8001"
     volumes:
       - redis_data:/data
     networks:
@@ -18,26 +18,44 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.api
+    image: rag-api-image:latest # <-- ADD THIS: Name the image after building
     container_name: rag_api_server
     ports:
       - "8000:8000"
     env_file:
-      - .env # Loads environment variables from a .env file (e.g., GEMINI_API_KEY)
+      - .env
+    volumes:
+      - .:/app
     depends_on:
-      - redis-stack # Ensures Redis is started before the API
+      - redis-stack
     networks:
       - rag_network
 
-  # 3. Frontend Web Server Service
+  # 3. File Watcher Service for Automatic Ingestion
+  api-watcher:
+    image: rag-api-image:latest
+    container_name: rag_api_watcher
+    # --- MODIFICATION START ---
+    # Use the new polling script which is more robust
+    command: python polling_watcher.py
+    # --- MODIFICATION END ---
+    volumes:
+      - .:/app
+    depends_on:
+      - redis-stack
+    networks:
+      - rag_network
+      
+  # 4. Frontend Web Server Service
   frontend:
     build:
       context: .
       dockerfile: Dockerfile.frontend
     container_name: rag_frontend_ui
     ports:
-      - "8080:80" # Expose frontend on host port 8080
+      - "8080:80"
     depends_on:
-      - rag-api # Ensures the API is ready before the frontend starts
+      - rag-api
     networks:
       - rag_network
 
