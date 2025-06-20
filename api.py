@@ -18,7 +18,7 @@ load_dotenv()
 app = FastAPI(
     title="Coding Standards RAG API",
     description="An API with Hybrid Search and a Re-ranking Model.",
-    version="4.2.0", # Version bump for new reranker model
+    version="5.0.0",
 )
 
 app.add_middleware(
