@@ -15,7 +15,7 @@ env/
 # Docker cache
 .dockerignore
 
-output/
+# output/
 checkpoints/
 
 evaluate_rag_gemini.py
